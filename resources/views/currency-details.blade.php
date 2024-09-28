@@ -15,7 +15,7 @@
     </div>
     <br>
     <h5>Currency Details & Histories</h5>
-    <p><i>N.B: Schedule run using cronjob command. manually setting 1 hourly update data</i></p>
+    <p><i>N.B: Schedule run using cronjob command. Will update after 1 hour from the last update (Repeat)</i></p>
 
     <b>Currency Name:</b> <span id="name"></span> <br>
     <b>Currency Rate: </b> <span id="rate"></span>

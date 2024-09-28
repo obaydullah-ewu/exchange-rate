@@ -24,7 +24,7 @@
     </div>
     <br>
     <h3>Currency Exchange Rates</h3>
-    <p><i>N.B: Schedule run using cronjob command. manually setting 1 hourly update data</i></p>
+    <p><i>N.B: Schedule run using cronjob command. Will update after 1 hour from the last update (Repeat)</i></p>
     <table class="table table-striped" id="exchangeRatesTable">
         <thead>
         <tr>
