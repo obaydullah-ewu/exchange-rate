@@ -8,12 +8,16 @@ use App\Models\CurrencyHistory;
 use App\Traits\ApiStatusTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 class CurrencyController extends Controller
 {
     use ApiStatusTrait;
+    protected $paginate = 5;
     public function index(): JsonResponse
     {
-        $response['currencies'] = Currency::paginate(10);
+        $response['user'] = Auth::guard('sanctum')->user();
+        $response['currencies'] = Currency::paginate($this->paginate);
         return $this->successApiResponse($response);
     }
 
@@ -23,9 +27,9 @@ class CurrencyController extends Controller
         return $this->successApiResponse($response);
     }
 
-    public function currencyHistories(Request $request): JsonResponse
+    public function currencyHistories(): JsonResponse
     {
-        $response['currency_histories'] = CurrencyHistory::paginate(10);
+        $response['currency_histories'] = CurrencyHistory::paginate($this->paginate);
         return $this->successApiResponse($response);
     }
 }

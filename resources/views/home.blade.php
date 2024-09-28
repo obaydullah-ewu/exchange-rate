@@ -4,11 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Currency Exchange Rates</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.min.css') }}">
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Currency Exchange Rates</h1>
+    <div class="logoutDiv">
+
+        <button type="button" id="logout" class="btn btn-primary">Logout</button>
+    </div>
+    <div class="loginDiv">
+    <h3>Login</h3>
+    <p><b>Email:</b> <i> admin@admin.com</i> <b>Password:</b> <i> 123456</i></p>
+    <form action="" id="ajaxForm">
+        @csrf
+        <input type="email" name="email" id="email" autocomplete="off">
+        <input type="password" name="password" id="password" autocomplete="off">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    </div>
+    <br></b>
+    <h3>Currency Exchange Rates</h3>
     <p><i>N.B: Schedule run using cronjob command. manually setting 1 hourly update data</i></p>
     <table class="table table-striped" id="exchangeRatesTable">
         <thead>
@@ -29,59 +44,120 @@
         </ul>
     </nav>
 </div>
-
+<script src="{{ asset('asset/js/ajax/libs/jquery/3.7.1/jquery.js') }}"></script>
+<script src="{{ asset('asset/js/ajax/libs/jquery/3.7.1/jquery.min.js') }}"></script>
 
 <script>
     function fetchExchangeRates(page = 1) {
         fetch(`/api/currencies?page=${page}`, {
             headers: {
-                'Authorization': 'Bearer Token',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
                 'Accept': 'application/json'
             }
         })
         .then(response => response.json())
         .then(data => {
-            let response = data.currencies;
-            let currencies = response.data;
-            const tableBody = document.querySelector('#exchangeRatesTable tbody');
-            const paginationControls = document.querySelector('#paginationControls');
+            if(data.message == 'Unauthenticated.'){
+                $('.logoutDiv').addClass('d-none')
+            }
+            if (data?.user){
+                $('.loginDiv').addClass('d-none')
+                let response = data.currencies;
+                let currencies = response.data;
+                const tableBody = document.querySelector('#exchangeRatesTable tbody');
+                const paginationControls = document.querySelector('#paginationControls');
 
-            tableBody.innerHTML = '';
-            paginationControls.innerHTML = '';
+                tableBody.innerHTML = '';
+                paginationControls.innerHTML = '';
 
-            currencies.forEach(currency => {
-                const row = `
+                currencies.forEach(currency => {
+                    const row = `
             <tr>
                 <td>${currency.id}</td>
                 <td>${currency.name}</td>
                 <td>${currency.rate}</td>
             </tr>
         `;
-                tableBody.innerHTML += row;
-            });
+                    tableBody.innerHTML += row;
+                });
 
-            if (response.current_page) {
-                if (response.current_page > 1) {
-                    const prevLink = `<li class="page-item"><a class="page-link" href="#" onclick="fetchExchangeRates(${response.current_page - 1})">Previous</a></li>`;
-                    paginationControls.innerHTML += prevLink;
+                if (response.current_page) {
+                    if (response.current_page > 1) {
+                        const prevLink = `<li class="page-item"><a class="page-link" href="#" onclick="fetchExchangeRates(${response.current_page - 1})">Previous</a></li>`;
+                        paginationControls.innerHTML += prevLink;
+                    }
+
+                    for (let i = 1; i <= response.last_page; i++) {
+                        const activeClass = i === response.current_page ? 'active' : '';
+                        const pageLink = `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="fetchExchangeRates(${i})">${i}</a></li>`;
+                        paginationControls.innerHTML += pageLink;
+                    }
+
+                    if (response.current_page < response.last_page) {
+                        const nextLink = `<li class="page-item"><a class="page-link" href="#" onclick="fetchExchangeRates(${response.current_page + 1})">Next</a></li>`;
+                        paginationControls.innerHTML += nextLink;
+                    }
                 }
 
-                for (let i = 1; i <= response.last_page; i++) {
-                    const activeClass = i === response.current_page ? 'active' : '';
-                    const pageLink = `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="fetchExchangeRates(${i})">${i}</a></li>`;
-                    paginationControls.innerHTML += pageLink;
-                }
-
-                if (response.current_page < response.last_page) {
-                    const nextLink = `<li class="page-item"><a class="page-link" href="#" onclick="fetchExchangeRates(${response.current_page + 1})">Next</a></li>`;
-                    paginationControls.innerHTML += nextLink;
-                }
             }
+
         })
         .catch(error => console.error('Error: ', error));
     }
 
     window.onload = () => fetchExchangeRates();
+
+</script>
+
+<script>
+    document.getElementById('ajaxForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem('auth_token', data.token);
+
+                    alert('Login successful!');
+                    window.location.href = '/';
+                } else {
+                    // Show error message
+                    alert(data.message)
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('logout').addEventListener('click', function(e) {
+        fetch('/api/logout', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem('auth_token', "");
+                alert('Logout successful!');
+                window.location.href = '/';
+            })
+            .catch(error => console.error('Error:', error));
+
+    })
 
 </script>
 </body>
