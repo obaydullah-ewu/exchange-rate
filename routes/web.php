@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::get('currency-details/{currency_id}', [HomeController::class, 'currencyDetails']);
+
+Route::get('cron-jobs', function (){
+   Artisan::call('exchange:update');
+});

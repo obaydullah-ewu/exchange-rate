@@ -7,7 +7,6 @@ use App\Models\Currency;
 use App\Models\CurrencyHistory;
 use App\Traits\ApiStatusTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CurrencyController extends Controller
