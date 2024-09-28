@@ -13,10 +13,13 @@ class ExchangeRateService
         $xml = simplexml_load_string($response->body());
 
         foreach ($xml->Valute as $valute) {
-            $currency = Currency::updateOrCreate(
-                ['name' => (string)$valute->CharCode],
-                ['rate' => (float)$valute->Value]
-            );
+            $currency = Currency::whereName($valute->CharCode)->first();
+            if (!$currency){
+                $currency = new Currency();
+            }
+            $currency->name = (string)$valute->CharCode;
+            $currency->rate = (float)$valute->Value;
+            $currency->save();
             CurrencyHistory::create([
                 'currency_id' => $currency->id,
                 'rate' => $currency->rate,

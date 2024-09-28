@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class CurrencyController extends Controller
 {
     use ApiStatusTrait;
-    protected $paginate = 5;
+    protected $paginate = 10;
     public function index(): JsonResponse
     {
         $response['user'] = Auth::guard('sanctum')->user();
@@ -27,9 +27,10 @@ class CurrencyController extends Controller
         return $this->successApiResponse($response);
     }
 
-    public function currencyHistories(): JsonResponse
+    public function currencyHistories($id): JsonResponse
     {
-        $response['currency_histories'] = CurrencyHistory::paginate($this->paginate);
+        $response['user'] = Auth::guard('sanctum')->user();
+        $response['currency_histories'] = CurrencyHistory::whereCurrencyId($id)->paginate($this->paginate);
         return $this->successApiResponse($response);
     }
 }
