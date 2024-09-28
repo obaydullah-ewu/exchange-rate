@@ -9,8 +9,8 @@
 <body>
 <div class="container mt-5">
     <div class="logoutDiv">
-
         <button type="button" id="logout" class="btn btn-primary">Logout</button>
+        <h5>Hello, <span class="username"></span></h5>
     </div>
     <div class="loginDiv">
     <h3>Login</h3>
@@ -62,6 +62,7 @@
             }
             if (data?.user){
                 $('.loginDiv').addClass('d-none')
+                $('.username').html(data.user.name)
                 let response = data.currencies;
                 let currencies = response.data;
                 const tableBody = document.querySelector('#exchangeRatesTable tbody');
@@ -75,7 +76,7 @@
             <tr>
                 <td>${currency.id}</td>
                 <td>${currency.name}</td>
-                <td>${currency.rate}</td>
+                <td>USD ${currency.rate}</td>
             </tr>
         `;
                     tableBody.innerHTML += row;
