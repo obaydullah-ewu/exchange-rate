@@ -17,8 +17,8 @@
         <p><b>Email:</b> <i> admin@admin.com</i> <b>Password:</b> <i> 123456</i></p>
         <form action="" id="ajaxForm" method="post">
             @csrf
-            <input type="email" name="email" id="email" autocomplete="off">
-            <input type="password" name="password" id="password" autocomplete="off">
+            <input type="email" name="email" id="email" placeholder="Enter your email" autocomplete="off">
+            <input type="password" name="password" id="password" placeholder="Enter your password" autocomplete="off">
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
